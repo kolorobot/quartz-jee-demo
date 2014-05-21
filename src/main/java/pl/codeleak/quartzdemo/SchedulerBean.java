@@ -28,6 +28,7 @@ public class SchedulerBean {
 
     @PostConstruct
     public void scheduleJobs() {
+
         try {
             scheduler = new StdSchedulerFactory().getScheduler();
             scheduler.setJobFactory(jobFactory);
@@ -43,7 +44,7 @@ public class SchedulerBean {
                     .newTrigger()
                     .withIdentity(tk1)
                     .startNow()
-                    .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(10))
+                    .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(5))
                     .build();
 
             TriggerKey tk2 = TriggerKey.triggerKey("trigger2", "my-jobs");
@@ -51,7 +52,7 @@ public class SchedulerBean {
                     .newTrigger()
                     .withIdentity(tk2)
                     .startNow()
-                    .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(10))
+                    .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(5))
                     .build();
 
             TriggerKey tk3 = TriggerKey.triggerKey("trigger3", "my-jobs");
@@ -59,13 +60,12 @@ public class SchedulerBean {
                     .newTrigger()
                     .withIdentity(tk3)
                     .startNow()
-                    .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(10))
+                    .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(5))
                     .build();
 
+            scheduler.start(); // starting a scheduler before scheduling jobs helped in getting rid of deadlock on startup
             scheduler.scheduleJob(job1, newHashSet(trigger1, trigger2, trigger3), true);
-            scheduler.start();
             printJobsAndTriggers(scheduler);
-
         } catch (SchedulerException e) {
             LOG.error("Error while creating scheduler", e);
         }
